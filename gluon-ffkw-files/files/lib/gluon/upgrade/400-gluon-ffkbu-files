@@ -4,16 +4,30 @@ uci set firewall.mesh.input='ACCEPT'
 uci commit firewall
 /etc/init.d/firewall reload
 
-#Die Supernodes fest eintragen, da bei Wireguard DNS erst läuft, wenn die Verbindung steht.
 
-#Erstmal alle alten Eintraege loeschen in der /etc/hosts
-grep -vwE "(ffkwsn01|ffkwsn02|ffkwsn03)" /etc/hosts > /tmp/hosts.sik
+# delete old ffkwsn entries in /etc/hosts files
+grep -vwE "(ffkwsn01|ffkwsn02|ffkwsn03|ffkwsn04)" /etc/hosts > /tmp/hosts.sik
 mv /tmp/hosts.sik /etc/hosts
-echo "195.8.226.26    ffkwsn01.freifunk-koenigswinter.de" >> /etc/hosts
-echo "85.13.139.108   ffkwsn02.freifunk-koenigswinter.de" >> /etc/hosts
-echo "144.91.101.189  ffkwsn03.freifunk-koenigswinter.de" >> /etc/hosts
-
- /etc/init.d/gluon-radvd disable
- /etc/init.d/gluon-radvd stop
 
 
+# use wan dns to connect to ffkw supernodes
+uci set network.wan.peerdns='1'
+uci set network.wan6.peerdns='1'
+
+# if in fact none of these dns servers can be reached, the wireguard/supernode connection is still established via the fixed config via direct ip without dns or via ipv6 dns
+# use typical default internal ip addresses for dns server
+uci add_list network.wan.dns='192.168.2.1'
+uci add_list network.wan.dns='192.168.1.1'
+uci add_list network.wan.dns='192.168.178.1'
+# use public ip addresses for dns server
+uci add_list network.wan.dns='1.1.1.1'
+uci add_list network.wan.dns='9.9.9.9'
+uci add_list network.wan.dns='8.8.8.8'
+uci add_list network.wan.dns='8.8.4.4'
+
+uci commit network
+/etc/init.d/network restart
+
+
+/etc/init.d/gluon-radvd disable
+/etc/init.d/gluon-radvd stop
