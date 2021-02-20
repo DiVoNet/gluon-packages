@@ -8,12 +8,5 @@ uci commit firewall
 grep -vwE "(ffkwsn01|ffkwsn02|ffkwsn03|ffkwsn04)" /etc/hosts > /tmp/hosts.sik
 mv /tmp/hosts.sik /etc/hosts
 
-# use wan dns to connect to supernodes via dns
-uci set network.wan.peerdns='1'
-uci set network.wan6.peerdns='1'
-
-uci commit network
-/etc/init.d/network restart
-
 /etc/init.d/gluon-radvd disable
 /etc/init.d/gluon-radvd stop
