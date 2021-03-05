@@ -1,17 +1,17 @@
 #!/bin/sh
 
 # generate private key if not exists
-temp=$(uci get wireguard.wireguard.privatekey)
+temp=$(uci get wireguard.mesh_vpn.privatekey)
 if [ "$?" -ne "0" ]; then
-        uci set wireguard.wireguard.privatekey=$(wg genkey)
+        uci set wireguard.mesh_vpn.privatekey=$(wg genkey)
         uci commit wireguard
 fi
 
-if [ "$(uci get wireguard.wireguard.enabled)" == "true" ] || [ "$(uci get wireguard.wireguard.enabled)" == "1" ]; then
+if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
 
         # todo refactor to default CONNECTED=0
         CONNECTED=1
-        INTERFACE=$(uci get wireguard.wireguard.iface)
+        INTERFACE=$(uci get wireguard.mesh_vpn.iface)
 
         # Wireguardinterface vorhanden???
         ip addr show dev $INTERFACE >/dev/null
@@ -37,7 +37,7 @@ if [ "$(uci get wireguard.wireguard.enabled)" == "true" ] || [ "$(uci get wiregu
 
         # Und funktioniert das Wireguardinterface? Kann ich den Server erreichen?
         if [ $CONNECTED != 0 ]; then
-                ping -c1 -w2 $(uci get wireguard.wireguard.gretapip)
+                ping -c1 -w2 $(uci get wireguard.mesh_vpn.gretapip)
                 if [ $? != 0 ]; then
                         CONNECTED=0
                 fi
@@ -84,8 +84,8 @@ if [ "$(uci get wireguard.wireguard.enabled)" == "true" ] || [ "$(uci get wiregu
                 ip link delete dev gre &> /dev/null
                 ip link delete dev $INTERFACE &> /dev/null
 
-                PUBLICKEY=$(uci get wireguard.wireguard.privatekey | wg pubkey)
-                echo $(uci get wireguard.wireguard.privatekey) > /root/wgpriv
+                PUBLICKEY=$(uci get wireguard.mesh_vpn.privatekey | wg pubkey)
+                echo $(uci get wireguard.mesh_vpn.privatekey) > /root/wgpriv
 
                 # push wg public key to sn
                 IP=$(gluon-wan curl -s -k --data-urlencode "pubkey=$PUBLICKEY" https://$URL/wireguard.php)
@@ -108,12 +108,12 @@ if [ "$(uci get wireguard.wireguard.enabled)" == "true" ] || [ "$(uci get wiregu
 
                 sleep 6
 
-                wg set $INTERFACE peer $(uci get wireguard.peer_$WG_PEER_NUMBER.publickey) persistent-keepalive 26 allowed-ips $(uci get wireguard.wireguard.gretapip)/32 endpoint $(uci get wireguard.peer_$WG_PEER_NUMBER.endpoint)
+                wg set $INTERFACE peer $(uci get wireguard.peer_$WG_PEER_NUMBER.publickey) persistent-keepalive 26 allowed-ips $(uci get wireguard.mesh_vpn.gretapip)/32 endpoint $(uci get wireguard.peer_$WG_PEER_NUMBER.endpoint)
                 ip link set up dev $INTERFACE
 
                 sleep 6
 
-                ip link add gre type gretap local $IP remote $(uci get wireguard.wireguard.gretapip)
+                ip link add gre type gretap local $IP remote $(uci get wireguard.mesh_vpn.gretapip)
                 ip link set up dev gre
 
                 sleep 6

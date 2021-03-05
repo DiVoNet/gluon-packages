@@ -3,34 +3,31 @@
 rm /etc/config/wireguard
 touch /etc/config/wireguard
 
-uci set wireguard.wireguard=wireguard
+uci set wireguard.mesh_vpn=mesh_vpn
 
-
-#Ist multidomainsupport aktiviert?
 domain=$(uci get gluon.core.domain)
-if [ -z "$domain" ]; then {                     #falls nein
-        datei="/lib/gluon/site.json";
-} else {                                        #falls ja
-        datei="/lib/gluon/domains/$domain.json";
+if [ -z "$domain" ]; then {
+        siteJson="/lib/gluon/site.json";
+} else {
+        siteJson="/lib/gluon/domains/$domain.json";
 }
-fi 
+fi
 
-uci set wireguard.wireguard.enabled=$(jsonfilter -i $datei -e "$.mesh_vpn.wireguard.enabled")
-uci set wireguard.wireguard.iface=$(jsonfilter -i $datei  -e "$.mesh_vpn.wireguard.iface")   
-uci set wireguard.wireguard.iprange=$(jsonfilter -i $datei  -e "$.mesh_vpn.wireguard.iprange")                                         
-uci set wireguard.wireguard.limit=$(jsonfilter -i $datei -e "$.mesh_vpn.wireguard.limit")     
-uci set wireguard.wireguard.gretapip=$(jsonfilter -i $datei  -e "$.mesh_vpn.wireguard.gretapip")
-                                                                                                
-#Wieviele peers haben wir denn?                                                                 
-anzahl=$(jsonfilter -i $datei  -e "$.mesh_vpn.wireguard.peers.*" | wc -l)                       
-anzahl=`expr $anzahl - 1`                                                                       
+uci set wireguard.mesh_vpn.enabled=$(jsonfilter -i $siteJson -e "$.mesh_vpn.wireguard.enabled")
+uci set wireguard.mesh_vpn.iface=$(jsonfilter -i $siteJson  -e "$.mesh_vpn.wireguard.iface")
+uci set wireguard.mesh_vpn.iprange=$(jsonfilter -i $siteJson  -e "$.mesh_vpn.wireguard.iprange")
+uci set wireguard.mesh_vpn.limit=$(jsonfilter -i $siteJson -e "$.mesh_vpn.wireguard.limit")
+uci set wireguard.mesh_vpn.gretapip=$(jsonfilter -i $siteJson  -e "$.mesh_vpn.wireguard.gretapip")
+                                                                                                                                                             
+count=$(jsonfilter -i $siteJson  -e "$.mesh_vpn.wireguard.peers.*" | wc -l)
+count=`expr $count - 1`
                                                                                                 
 i=0                                                                      
-while [ $i -le $anzahl ]                                                 
+while [ $i -le $count ]
 do                                                                       
         uci set wireguard.peer_$(expr $i + 1)=peer
-        uci set wireguard.peer_$(expr $i + 1).endpoint=$(jsonfilter -i $datei  -e "$.mesh_vpn.wireguard.peers[$i].endpoint")
-        uci set wireguard.peer_$(expr $i + 1).publickey=$(jsonfilter -i $datei  -e "$.mesh_vpn.wireguard.peers[$i].publickey")
+        uci set wireguard.peer_$(expr $i + 1).endpoint=$(jsonfilter -i $siteJson  -e "$.mesh_vpn.wireguard.peers[$i].endpoint")
+        uci set wireguard.peer_$(expr $i + 1).publickey=$(jsonfilter -i $siteJson  -e "$.mesh_vpn.wireguard.peers[$i].publickey")
         i=`expr $i + 1`                                                                                                       
 done                                                                                                                          
                                                                                                                               
