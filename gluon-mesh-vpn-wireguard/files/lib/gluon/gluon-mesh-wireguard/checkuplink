@@ -31,15 +31,18 @@ if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
         if [ $CONNECTED != 0 ]; then
                 RXBYTES=$(ip -statistics link show dev gre | sed '4q;d' | awk '{print $1}')
                 if [ $RXBYTES == 0 ]; then
-                        CONNECTED=0
+                		CONNECTED=0
                 fi
         fi
 
         # Und funktioniert das Wireguardinterface? Kann ich den Server erreichen?
         if [ $CONNECTED != 0 ]; then
-                ping -c1 -w2 $(uci get wireguard.mesh_vpn.gretapip)
+                ping -c1 -w2 $(uci get wireguard.mesh_vpn.gretapip) &> /dev/null
                 if [ $? != 0 ]; then
-                        CONNECTED=0
+              			CONNECTED=0
+                else
+                		echo "OK, connected to DiVoNet."
+                    exit 0;
                 fi
         fi
 

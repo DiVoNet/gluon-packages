@@ -2,10 +2,9 @@
 
 uci set firewall.mesh.input='ACCEPT'
 uci commit firewall
-/etc/init.d/firewall reload
 
 # delete old ffkwsn entries in /etc/hosts files
-grep -vwE "(ffkwsn01|ffkwsn02|ffkwsn03|ffkwsn04)" /etc/hosts > /tmp/hosts.sik
+grep -vwE "(ffkwsn)" /etc/hosts > /tmp/hosts.sik
 mv /tmp/hosts.sik /etc/hosts
 
 /etc/init.d/gluon-radvd disable

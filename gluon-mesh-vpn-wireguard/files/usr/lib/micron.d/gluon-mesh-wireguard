@@ -1,1 +1,1 @@
-*/4 * * * * /lib/gluon/gluon-mesh-wireguard/checkuplink
+*/3 * * * * /lib/gluon/gluon-mesh-wireguard/checkuplink
