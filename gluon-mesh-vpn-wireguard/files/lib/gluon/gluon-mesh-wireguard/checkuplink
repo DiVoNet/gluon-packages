@@ -74,7 +74,7 @@ if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
                         exit 1;
                 fi
                 
-                grep -vwE "(freifunk-koenigswinter.de|divonet.de)" /etc/hosts > /tmp/hosts.sik
+                grep -vwE "(freifunk-koenigswinter.de|divonet.de|divonet.com)" /etc/hosts > /tmp/hosts.sik
                 mv /tmp/hosts.sik /etc/hosts
 
                 SN_IP=$(gluon-wan nslookup $URL | awk -F': ' 'NR==5 {print $2} ')
