@@ -7,5 +7,5 @@ uci commit firewall
 grep -vwE "(ffkwsn)" /etc/hosts > /tmp/hosts.sik
 mv /tmp/hosts.sik /etc/hosts
 
-/etc/init.d/gluon-radvd disable
-/etc/init.d/gluon-radvd stop
+/etc/init.d/gluon-radvd stop 2>/dev/null || true
+/etc/init.d/gluon-radvd disable 2>/dev/null || true
