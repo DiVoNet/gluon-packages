@@ -90,9 +90,10 @@ if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
                 PUBLICKEY=$(uci get wireguard.mesh_vpn.privatekey | wg pubkey)
                 echo $(uci get wireguard.mesh_vpn.privatekey) > /root/wgpriv
                 NODE=$(uci get system.@system[0].hostname)
-
+		DOMAIN=$(uci get gluon.core.domain)
+		
                 # push wg public key to sn
-                IP=$(gluon-wan curl -s -k --data-urlencode "pubkey=$PUBLICKEY" --data-urlencode "node=$NODE" https://$URL/wireguard.php)
+                IP=$(gluon-wan curl -s -k --data-urlencode "pubkey=$PUBLICKEY" --data-urlencode "node=$NODE" --data-urlencode "domain=$DOMAIN" https://$URL/wireguard.php)
                 if expr "$IP" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$' > /dev/null; then
                         for i in 1 2 3 4; do
                                 if [ $(echo "$IP" | cut -d. -f$i) -gt 255 ]; then
