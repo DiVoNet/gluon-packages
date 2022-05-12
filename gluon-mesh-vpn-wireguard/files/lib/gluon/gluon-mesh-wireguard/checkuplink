@@ -11,7 +11,7 @@ if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
 
         # todo refactor to default CONNECTED=0
         CONNECTED=1
-        INTERFACE=$(uci get wireguard.mesh_vpn.iface)
+        INTERFACE=mesh-vpn
 
         # Wireguardinterface vorhanden???
         ip addr show dev $INTERFACE >/dev/null
@@ -37,7 +37,7 @@ if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
 
         # Und funktioniert das Wireguardinterface? Kann ich den Server erreichen?
         if [ $CONNECTED != 0 ]; then
-                ping -c1 -w2 $(uci get wireguard.mesh_vpn.gretapip) &> /dev/null
+                ping -c1 -w2 10.3.0.2 &> /dev/null
                 if [ $? != 0 ]; then
               			CONNECTED=0
                 else
@@ -113,12 +113,12 @@ if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
 
                 sleep 6
 
-                wg set $INTERFACE peer $(uci get wireguard.peer_$WG_PEER_NUMBER.publickey) persistent-keepalive 26 allowed-ips $(uci get wireguard.mesh_vpn.gretapip)/32 endpoint $(uci get wireguard.peer_$WG_PEER_NUMBER.endpoint)
+                wg set $INTERFACE peer $(uci get wireguard.peer_$WG_PEER_NUMBER.publickey) persistent-keepalive 26 allowed-ips 10.3.0.2/32 endpoint $(uci get wireguard.peer_$WG_PEER_NUMBER.endpoint)
                 ip link set up dev $INTERFACE
 
                 sleep 6
 
-                ip link add gre type gretap local $IP remote $(uci get wireguard.mesh_vpn.gretapip)
+                ip link add gre type gretap local $IP remote 10.3.0.2
                 ip link set up dev gre
 
                 sleep 6
