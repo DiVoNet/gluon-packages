@@ -91,9 +91,11 @@ if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
                 echo $(uci get wireguard.mesh_vpn.privatekey) > /root/wgpriv
                 NODE=$(uci get system.@system[0].hostname)
 		DOMAIN=$(uci get gluon.core.domain)
+		DEVICE=$(lua -e 'print(require("platform_info").get_model())')
+		FIRMWARE=$(cat /lib/gluon/release && echo '/' && cat /lib/gluon/gluon-version)
 		
                 # push wg public key to sn
-                IP=$(gluon-wan curl -s -k --data-urlencode "pubkey=$PUBLICKEY" --data-urlencode "node=$NODE" --data-urlencode "domain=$DOMAIN" https://$URL/wireguard.php)
+                IP=$(gluon-wan curl -s -k --data-urlencode "pubkey=$PUBLICKEY" --data-urlencode "node=$NODE" --data-urlencode "domain=$DOMAIN" --data-urlencode "device=$DEVICE" --data-urlencode "firmware=$FIRMWARE" https://$URL/wireguard.php)
                 if expr "$IP" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$' > /dev/null; then
                         for i in 1 2 3 4; do
                                 if [ $(echo "$IP" | cut -d. -f$i) -gt 255 ]; then
@@ -126,5 +128,7 @@ if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
                 batctl if add gre
                 iptables -A INPUT -i $INTERFACE -j ACCEPT
                 iptables -A FORWARD -i $INTERFACE -j ACCEPT
+		
+		echo "OK, connected to DiVoNet."
         fi
 fi
