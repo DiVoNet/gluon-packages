@@ -7,7 +7,7 @@ return function(form, uci)
 		return
 	end
 
-	local pkg_i18n = i18n 'gluon-mesh-vpn-wireguard'
+	local pkg_i18n = i18n 'gluon-mesh-vpn-wg'
 
 	local msg = pkg_i18n.translate(
 		'Your internet connection can be used to establish a ' ..
