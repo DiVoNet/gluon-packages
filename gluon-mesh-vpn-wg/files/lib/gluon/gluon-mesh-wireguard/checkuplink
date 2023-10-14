@@ -41,8 +41,8 @@ if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
                 if [ $? != 0 ]; then
               			CONNECTED=0
                 else
-                		echo "OK, connected to DiVoNet."
-                    exit 0;
+                		echo "OK, already connected to DiVoNet."
+                    		exit 0;
                 fi
         fi
 
@@ -77,7 +77,7 @@ if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
                 grep -vwE "(freifunk-koenigswinter.de|divonet.de|divonet.com)" /etc/hosts > /tmp/hosts.sik
                 mv /tmp/hosts.sik /etc/hosts
 
-                SN_IP=$(gluon-wan nslookup $URL | awk -F': ' 'NR==5 {print $2} ')
+		SN_IP=$(gluon-wan nslookup $URL | awk '/^Name:/ {N=$2}; /^Address:/ {A=$2}; END {print A}')
                 ENTRY="$SN_IP $URL"
                 echo $ENTRY >> /etc/hosts
 
@@ -129,6 +129,6 @@ if [ "$(uci get wireguard.mesh_vpn.enabled)" == "1" ]; then
                 iptables -A INPUT -i $INTERFACE -j ACCEPT
                 iptables -A FORWARD -i $INTERFACE -j ACCEPT
 		
-		echo "OK, connected to DiVoNet."
+		echo "OK, now connected to DiVoNet."
         fi
 fi
