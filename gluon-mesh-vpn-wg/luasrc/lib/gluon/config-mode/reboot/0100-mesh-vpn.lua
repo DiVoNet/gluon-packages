@@ -10,7 +10,7 @@ local util = require "gluon.util"
 
 local pretty_hostname = require 'pretty_hostname'
 
-local has_wireguard = unistd.access('/lib/gluon/mesh-vpn/wireguard')
+local has_wireguard = unistd.access('/lib/gluon/mesh-vpn/provider/wireguard')
 
 local hostname = pretty_hostname.get(uci)
 local contact = uci:get_first("gluon-node-info", "owner", "contact")

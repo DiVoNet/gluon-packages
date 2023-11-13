@@ -1,6 +1,6 @@
 local unistd = require 'posix.unistd'
 
-local has_wireguard = unistd.access('/lib/gluon/mesh-vpn/wireguard')
+local has_wireguard = unistd.access('/lib/gluon/mesh-vpn/provider/wireguard')
 
 return function(form, uci)
 	if not (has_wireguard) then
